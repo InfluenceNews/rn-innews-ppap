@@ -15,6 +15,17 @@ jobs:
     name: Init
     runs-on: macos-14
     steps:
+      - name: Setup Node v18
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Setup cocoapods
+        # if: matrix.platform == 'IOS'
+        uses: maxim-lobanov/setup-cocoapods@v1
+        with:
+          version: 1.14.3
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
