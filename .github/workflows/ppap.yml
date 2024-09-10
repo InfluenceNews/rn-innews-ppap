@@ -1,0 +1,23 @@
+name: PPAP
+
+on:
+  repository_dispatch:
+    types:
+      - ppap
+      - v*
+
+  push:
+    branches:
+      - main
+
+jobs:
+  init:
+    name: Init
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: InfluenceNews/rn-innews
+          token: ${{ secrets.INFLUENCE_NEWS_GH_PAT }}
+          ref: ${{ github.event.client_payload.ref_name}}
