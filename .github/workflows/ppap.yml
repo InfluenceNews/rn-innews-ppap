@@ -48,6 +48,9 @@ jobs:
         with:
           cmd: install --network-concurrency 1
 
+      - name: Remove native directories
+        run: rm -rf ios android
+
       - name: Run expo prebuild
         uses: borales/actions-yarn@v5
         with:
