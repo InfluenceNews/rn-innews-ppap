@@ -30,5 +30,26 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: InfluenceNews/rn-innews
-          token: ${{ secrets.INFLUENCE_NEWS_GH_PAT }}
+          token: ${{ secrets.GH_PAT_INFLUENCE_NEWS }}
           ref: ${{ github.event.client_payload.ref_name}}
+      
+      # NOTE: install libs
+      - name: Cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          # key: ${{ matrix.platform }}-cache-node-modules-${{ hashFiles('yarn.lock') }}
+          key: cache-node-modules-${{ hashFiles('yarn.lock') }}
+      
+      - name: Run yarn install
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        uses: borales/actions-yarn@v5
+        with:
+          cmd: install --network-concurrency 1
+
+      - name: Run yarn install
+        uses: borales/actions-yarn@v5
+        with:
+          cmd: prebuild:dev
+      
