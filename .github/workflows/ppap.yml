@@ -69,6 +69,7 @@ jobs:
         working-directory: ios
         run: pod install
 
-      - name: Check fastlane
-        run: fastlane --version     
-      
+      - name: Fastlane match
+        run: fastlane match appstore
+        env:
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.GH_PAT_CARZ }}
