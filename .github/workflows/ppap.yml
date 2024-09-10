@@ -80,8 +80,11 @@ jobs:
       - name: Update version and build number
         run: fastlane ios update_version_and_build_number
         env: 
-          APP_BUILD_NUMBER: 12
           APP_VERSION: 1.0.3
+          APP_BUILD_NUMBER: 12
+
+      - name: Test
+        run: cd ios && ls
 
       - name: Build app
         run: fastlane ios build_ipa
