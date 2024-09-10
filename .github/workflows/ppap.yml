@@ -15,7 +15,14 @@ jobs:
     name: Init
     runs-on: macos-14
     steps:
-      - name: Setup Node v18
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: InfluenceNews/rn-innews
+          token: ${{ secrets.GH_PAT_INFLUENCE_NEWS }}
+          # ref: ${{ github.event.client_payload.ref_name}}
+
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
@@ -25,13 +32,6 @@ jobs:
         uses: maxim-lobanov/setup-cocoapods@v1
         with:
           version: 1.15.2
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          repository: InfluenceNews/rn-innews
-          token: ${{ secrets.GH_PAT_INFLUENCE_NEWS }}
-          # ref: ${{ github.event.client_payload.ref_name}}
       
       # NOTE: install libs
       - name: Cache node_modules
