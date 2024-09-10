@@ -31,7 +31,7 @@ jobs:
         with:
           repository: InfluenceNews/rn-innews
           token: ${{ secrets.GH_PAT_INFLUENCE_NEWS }}
-          ref: ${{ github.event.client_payload.ref_name}}
+          # ref: ${{ github.event.client_payload.ref_name}}
       
       # NOTE: install libs
       - name: Cache node_modules
