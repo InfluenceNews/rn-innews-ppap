@@ -127,32 +127,32 @@ jobs:
           ndk-version: r26c
       
       - name: Install fastlane plugins
-        run: fastlane install_plugins
+        run: bundle exec fastlane install_plugins
 
       - name: Fastlane match
         if: matrix.platform == 'ios'
         run: |
           chmod 400 .github/data/key/itcarz
-          fastlane ios certificates
-          fastlane ios update_settings_dev
+          bundle exec fastlane ios certificates
+          bundle exec fastlane ios update_settings_dev
 
       - name: Update version and build number
-        run: fastlane ${{ matrix.platform }} update_version_and_build_number
+        run: bundle exec fastlane ${{ matrix.platform }} update_version_and_build_number
         env:
           APP_VERSION: 1.0.3
           APP_BUILD_NUMBER: 12
 
       - name: Build ios
         if: matrix.format == 'ipa'
-        run: fastlane ios build_ipa
+        run: bundle exec fastlane ios build_ipa
 
       - name: Build apk
         if: matrix.format == 'apk'
-        run: fastlane android build_apk
+        run: bundle exec fastlane android build_apk
 
       - name: Build aab
         if: matrix.format == 'aab'
-        run: fastlane android build_aab
+        run: bundle exec fastlane android build_aab
 
       # - name: Deploy ipa
       #   if: matrix.format == 'ipa'
