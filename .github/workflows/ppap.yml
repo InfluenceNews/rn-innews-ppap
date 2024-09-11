@@ -104,13 +104,13 @@ jobs:
             node_modules
             ios
             android
-          key: ${{ matrix.platform }}-cache-prebuild-${{ hashFiles('app.config.js') }}
+          key: ${{ matrix.platform }}-cache-prebuild-${{ hashFiles('app.config.js') }}-${{ hashFiles('yarn.lock') }}
 
       - name: Cache ios
         uses: irgaly/xcode-cache@v1
         if: matrix.platform == 'ios'
         with:
-          key: xcode-cache-deriveddata-${{ needs.init.outputs.env }}-${{ hashFiles('app.config.js') }}
+          key: xcode-cache-deriveddata-${{ needs.init.outputs.env }}-${{ hashFiles('app.config.js') }}}-${{ hashFiles('yarn.lock') }}
           restore-keys: xcode-cache-deriveddata-${{ needs.init.outputs.env }}-
 
       - name: Run yarn install
@@ -137,8 +137,6 @@ jobs:
           chmod 400 .github/data/key/itcarz
           fastlane ios certificates
           fastlane ios update_settings_dev
-        env:
-          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.GH_PAT_CARZ }}
 
       - name: Update ios version and build number
         if: matrix.platform == 'ios'
