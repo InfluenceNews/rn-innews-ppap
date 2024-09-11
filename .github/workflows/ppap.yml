@@ -125,9 +125,11 @@ jobs:
         if: matrix.platform == 'android'
         with:
           ndk-version: r26c
-      
+
       - name: Install fastlane plugins
-        run: fastlane install_plugins
+        uses: maierj/fastlane-action@v3.1.0
+        with:
+          lane: install_plugins
 
       - name: Fastlane match
         if: matrix.platform == 'ios'
