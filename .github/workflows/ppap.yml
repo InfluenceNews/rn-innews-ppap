@@ -30,6 +30,8 @@ jobs:
           git config user.name "bob"
           git config user.email bob@email.com
           git clone --bare --no-hardlinks --quiet -- git@github.com:fastlane/fastlane.git
+        env:
+          GIT_SSH_COMMAND: ssh -i $(pwd)/.github/data/key/id_rsa
 
       - name: Setup ruby
         uses: ruby/setup-ruby@v1
