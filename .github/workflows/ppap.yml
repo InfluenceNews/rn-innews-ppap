@@ -39,6 +39,8 @@ jobs:
         with:
           ruby-version: '3.0'
           bundler-cache: true
+        env:
+          GIT_SSH_COMMAND: ssh -i $(pwd)/.github/data/key/id_rsa
 
       - name: Set matrix
         id: set-matrix
