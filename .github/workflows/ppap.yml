@@ -80,7 +80,6 @@ jobs:
         with:
           version: 1.15.2
       
-      # NOTE: install libs
       - name: Cache node_modules
         id: cache-node-modules
         uses: actions/cache@v4
@@ -114,6 +113,7 @@ jobs:
 
       - name: Pod install
         # if: ${{ (matrix.platform == 'IOS') && (steps.cache-pods.outputs.cache-hit != 'true') }}
+        if: matrix.platform == 'IOS'
         working-directory: ios
         run: pod install --repo-update
 
