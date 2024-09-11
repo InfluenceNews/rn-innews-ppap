@@ -157,8 +157,8 @@ jobs:
 
       - name: Build apk
         if: matrix.format == 'APK'
-        run: fastlane ios build_apk
+        run: fastlane android build_apk
 
       - name: Build aab
         if: matrix.format == 'AAB'
-        run: fastlane ios build_aab
+        run: fastlane android build_aab
