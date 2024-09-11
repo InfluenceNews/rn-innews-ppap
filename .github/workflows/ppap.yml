@@ -79,13 +79,11 @@ jobs:
         with:
           version: 1.15.2
 
-      - uses: ruby/setup-ruby@v1
+      - name: Setup ruby
+        uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3'
+          ruby-version: '2.6'
           bundler-cache: true
-
-      - name: Install gem
-        run: bundle install
 
       - name: Cache prebuild
         id: cache-prebuild
