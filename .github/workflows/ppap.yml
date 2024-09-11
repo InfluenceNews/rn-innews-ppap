@@ -12,7 +12,7 @@ on:
 
 env:
   GIT_SSH_COMMAND: ssh -i $(pwd)/.github/data/key/id_rsa
-  
+
 jobs:
   init:
     name: Init
@@ -28,20 +28,8 @@ jobs:
           token: ${{ secrets.GH_PAT_INFLUENCE_NEWS }}
           # ref: ${{ github.event.client_payload.ref_name}}
       
-      - name: Test
-        run: |
-          chmod 400 .github/data/key/id_rsa
-          git config user.name "bob"
-          git config user.email bob@email.com
-          git clone --bare --no-hardlinks --quiet -- git@github.com:fastlane/fastlane.git
-        env:
-          GIT_SSH_COMMAND: ssh -i $(pwd)/.github/data/key/id_rsa
-
-      - name: Setup ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.0'
-          bundler-cache: true
+      - name: Allow key permissions
+        run: chmod 400 .github/data/key/id_rsa
 
       - name: Set matrix
         id: set-matrix
@@ -85,6 +73,9 @@ jobs:
           repository: InfluenceNews/rn-innews
           token: ${{ secrets.GH_PAT_INFLUENCE_NEWS }}
           # ref: ${{ github.event.client_payload.ref_name}}
+      
+      - name: Allow key permissions
+        run: chmod 400 .github/data/key/id_rsa
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -100,7 +91,7 @@ jobs:
       - name: Setup ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0'
+          ruby-version: 3.3
           bundler-cache: true
 
       - name: Cache prebuild
@@ -155,10 +146,7 @@ jobs:
 
       - name: Fastlane match
         if: matrix.platform == 'ios'
-        run: |
-          chmod 400 .github/data/key/id_rsa
-          bundle exec fastlane ios certificates
-          bundle exec fastlane ios update_settings_dev
+        run: bundle exec fastlane ios certificates && bundle exec fastlane ios update_settings_dev
 
       - name: Update version and build number
         run: bundle exec fastlane ${{ matrix.platform }} update_version_and_build_number
