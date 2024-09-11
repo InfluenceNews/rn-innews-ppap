@@ -79,23 +79,6 @@ jobs:
         with:
           version: 1.15.2
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        if: matrix.platform == 'android'
-        with:
-          java-version: 21
-          distribution: "temurin"
-
-      - name: Setup Android SDK
-        if: matrix.platform == 'android'
-        uses: android-actions/setup-android@v3
-
-      - name: Setup Android NDK
-        uses: nttld/setup-ndk@v1
-        if: matrix.platform == 'android'
-        with:
-          ndk-version: r26c
-
       - name: Cache prebuild
         id: cache-prebuild
         uses: actions/cache@v4
@@ -125,11 +108,23 @@ jobs:
         with:
           cmd: prebuild:dev --platform ${{ matrix.platform }}
 
-      # - name: Run expo prebuild
-      #   if: steps.cache-prebuild.outputs.cache-hit != 'true'
-      #   uses: borales/actions-yarn@v5
-      #   with:
-      #     cmd: prebuild:dev --platform ${{ matrix.platform }}
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        if: matrix.platform == 'android'
+        with:
+          java-version: 21
+          distribution: "temurin"
+          cache: "gradle"
+
+      - name: Setup Android SDK
+        if: matrix.platform == 'android'
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        if: matrix.platform == 'android'
+        with:
+          ndk-version: r26c
 
       - name: Fastlane match
         if: matrix.platform == 'ios'
@@ -139,8 +134,7 @@ jobs:
           fastlane ios update_settings_dev
 
       - name: Update ios version and build number
-        if: matrix.platform == 'ios'
-        run: fastlane ios update_version_and_build_number
+        run: fastlane ${{ matrix.platform }} update_version_and_build_number
         env:
           APP_VERSION: 1.0.3
           APP_BUILD_NUMBER: 12
@@ -156,3 +150,21 @@ jobs:
       - name: Build aab
         if: matrix.format == 'aab'
         run: fastlane android build_aab
+
+      # - name: Deploy ipa
+      #   if: matrix.format == 'ipa'
+      #   uses: maierj/fastlane-action@v3.1.0
+      #   with:
+      #     lane: ios deploy_ipa
+
+      # - name: Deploy APK to firebase
+      #   if: matrix.format == 'apk'
+      #   uses: maierj/fastlane-action@v3.1.0
+      #   with:
+      #     lane: android deploy_apk
+
+      # - name: Deploy AAB to playstore
+      #   if: matrix.format == 'aab'
+      #   uses: maierj/fastlane-action@v3.1.0
+      #   with:
+      #     lane: android deploy_aab
