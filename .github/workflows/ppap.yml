@@ -32,6 +32,7 @@ jobs:
           if [[ "$REF_NAME" =~ "prd" ]]; then
             MATRIX="[{\"format\":\"IPA\",\"name\":\"macos-14\",\"platform\":\"IOS\"},{\"format\":\"APK\",\"name\":\"ubuntu-22.04\",\"platform\":\"ANDROID\"},{\"format\":\"AAB\",\"name\":\"ubuntu-22.04\",\"platform\":\"ANDROID\"}]"
           fi
+          MATRIX="[{\"format\":\"IPA\",\"name\":\"macos-14\",\"platform\":\"IOS\"},{\"format\":\"APK\",\"name\":\"ubuntu-22.04\",\"platform\":\"ANDROID\"},{\"format\":\"AAB\",\"name\":\"ubuntu-22.04\",\"platform\":\"ANDROID\"}]"
           echo "value=$MATRIX" >> $GITHUB_OUTPUT
 
       - name: Set env
@@ -79,6 +80,24 @@ jobs:
         uses: maxim-lobanov/setup-cocoapods@v1
         with:
           version: 1.15.2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        if: matrix.platform == 'ANDROID'
+        with:
+          java-version: 21
+          distribution: "temurin"
+          cache: "gradle"
+
+      - name: Setup Android SDK
+        if: matrix.platform == 'ANDROID'
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        if: matrix.platform == 'ANDROID'
+        with:
+          ndk-version: r26c
       
       - name: Cache node_modules
         id: cache-node-modules
@@ -133,6 +152,14 @@ jobs:
           APP_VERSION: 1.0.3
           APP_BUILD_NUMBER: 12
 
-      - name: Build app
+      - name: Build ios
         if: matrix.platform == 'IOS'
         run: fastlane ios build_ipa
+
+      - name: Build apk
+        if: matrix.format == 'APK'
+        run: fastlane ios build_apk
+
+      - name: Build aab
+        if: matrix.format == 'AAB'
+        run: fastlane ios build_aab
