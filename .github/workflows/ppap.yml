@@ -27,7 +27,7 @@ jobs:
       
       - name: Test
         run: |
-          chmod 400 .github/data/key/itcarz
+          chmod 400 .github/data/key/id_rsa
           git config user.name "bob"
           git config user.email bob@email.com
           git clone --bare --no-hardlinks --quiet -- git@github.com:fastlane/fastlane.git
@@ -153,7 +153,7 @@ jobs:
       - name: Fastlane match
         if: matrix.platform == 'ios'
         run: |
-          chmod 400 .github/data/key/itcarz
+          chmod 400 .github/data/key/id_rsa
           bundle exec fastlane ios certificates
           bundle exec fastlane ios update_settings_dev
 
