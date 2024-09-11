@@ -27,6 +27,7 @@ jobs:
       
       - name: Test
         run: |
+          chmod 400 .github/data/key/itcarz
           git config user.name "bob"
           git config user.email bob@email.com
           git clone --bare --no-hardlinks --quiet -- git@github.com:fastlane/fastlane.git
