@@ -79,9 +79,6 @@ jobs:
         with:
           version: 1.15.2
 
-      - name: Install gem
-        run: bundle install
-
       - name: Cache prebuild
         id: cache-prebuild
         uses: actions/cache@v4
@@ -128,11 +125,9 @@ jobs:
         if: matrix.platform == 'android'
         with:
           ndk-version: r26c
-
+      
       - name: Install fastlane plugins
-        uses: maierj/fastlane-action@v3.1.0
-        with:
-          lane: install_plugins
+        run: fastlane install_plugins
 
       - name: Fastlane match
         if: matrix.platform == 'ios'
