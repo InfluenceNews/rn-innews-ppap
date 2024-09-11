@@ -25,6 +25,12 @@ jobs:
           token: ${{ secrets.GH_PAT_INFLUENCE_NEWS }}
           # ref: ${{ github.event.client_payload.ref_name}}
 
+      - name: Setup ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+          bundler-cache: true
+
       - name: Set matrix
         id: set-matrix
         run: |
@@ -82,7 +88,7 @@ jobs:
       - name: Setup ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.6'
+          ruby-version: '3.0'
           bundler-cache: true
 
       - name: Cache prebuild
