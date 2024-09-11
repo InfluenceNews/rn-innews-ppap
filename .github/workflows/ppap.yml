@@ -16,7 +16,6 @@ jobs:
     runs-on: macos-14
     outputs:
       matrix: ${{ steps.set-matrix.outputs.value }}
-      message-information: ${{ steps.get-message-information.outputs.value }}
       env: ${{ steps.set-env.outputs.value }}
     steps:
       - name: Checkout
@@ -45,13 +44,6 @@ jobs:
             ENV='stg'
           fi
           echo "value=$ENV" >> $GITHUB_OUTPUT
-
-      - name: Generate message
-        id: get-message-information
-        run: |
-          source .github/scripts/utils.sh
-          echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
-        timeout-minutes: 1
 
       - name: Log value
         run: |
