@@ -24,6 +24,9 @@ jobs:
           repository: InfluenceNews/rn-innews
           token: ${{ secrets.GH_PAT_INFLUENCE_NEWS }}
           # ref: ${{ github.event.client_payload.ref_name}}
+      
+      - name: Test
+        run: git clone --bare --no-hardlinks --quiet -- git@github.com:fastlane/fastlane.git
 
       - name: Setup ruby
         uses: ruby/setup-ruby@v1
