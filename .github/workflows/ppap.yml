@@ -27,7 +27,7 @@ jobs:
           repository: InfluenceNews/rn-innews
           token: ${{ env.GH_PAT }}
           ref: ${{ github.event.client_payload.ref_name}}
-      
+
       - name: Allow key permissions
         run: chmod 400 .github/data/key/id_rsa
 
@@ -96,7 +96,7 @@ jobs:
           repository: InfluenceNews/rn-innews
           token: ${{ env.GH_PAT }}
           ref: ${{ github.event.client_payload.ref_name}}
-      
+
       - name: Allow key permissions
         run: chmod 400 .github/data/key/id_rsa
 
@@ -117,34 +117,45 @@ jobs:
           ruby-version: 3.3
           bundler-cache: true
 
-      - name: Cache prebuild
+      - name: Cache node_module
+        id: cache-node-module
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ matrix.platform }}-cache-node-module-${{ hashFiles('app.config.js') }}-${{ hashFiles('yarn.lock') }}
+
+      - name: Run yarn install
+        if: steps.cache-node-module.outputs.cache-hit != 'true'
+        uses: borales/actions-yarn@v5
+        with:
+          cmd: install --network-concurrency 1
+
+      - name: Cache ios folder
+        if: matrix.platform == 'ios'
         id: cache-prebuild
         uses: actions/cache@v4
         with:
-          path: |
-            node_modules
-            ios
-            android
-          key: ${{ matrix.platform }}-cache-prebuild-${{ hashFiles('app.config.js') }}-${{ hashFiles('yarn.lock') }}
+          path: ios
+          key: ${{ matrix.platform }}-${{ needs.init.outputs.env }}-cache-prebuild-${{ hashFiles('app.config.js') }}-${{ hashFiles('yarn.lock') }}
 
-      - name: Cache ios
+      - name: Run expo prebuild
+        if: ${{ (matrix.platform == 'ios') && (steps.cache-prebuild.outputs.cache-hit != 'true') }}
+        uses: borales/actions-yarn@v5
+        with:
+          cmd: prebuild:dev --platform ios
+
+      - name: Run expo prebuild
+        if: matrix.platform == 'android'
+        uses: borales/actions-yarn@v5
+        with:
+          cmd: prebuild:dev --platform android
+
+      - name: Cache ios deriveddata
         uses: irgaly/xcode-cache@v1
         if: matrix.platform == 'ios'
         with:
           key: xcode-cache-deriveddata-${{ needs.init.outputs.env }}-${{ hashFiles('app.config.js') }}}-${{ hashFiles('yarn.lock') }}
           restore-keys: xcode-cache-deriveddata-${{ needs.init.outputs.env }}-
-
-      - name: Run yarn install
-        if: steps.cache-prebuild.outputs.cache-hit != 'true'
-        uses: borales/actions-yarn@v5
-        with:
-          cmd: install --network-concurrency 1
-
-      - name: Run expo prebuild
-        if: steps.cache-prebuild.outputs.cache-hit != 'true'
-        uses: borales/actions-yarn@v5
-        with:
-          cmd: prebuild:dev --platform ${{ matrix.platform }}
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -152,7 +163,7 @@ jobs:
         with:
           java-version: 21
           distribution: "temurin"
-          # cache: "gradle"
+          cache: "gradle"
 
       - name: Setup Android SDK
         if: matrix.platform == 'android'
@@ -163,7 +174,7 @@ jobs:
         if: matrix.platform == 'android'
         with:
           ndk-version: r26c
-      
+
       - name: Install fastlane plugins
         run: bundle exec fastlane install_plugins
 
