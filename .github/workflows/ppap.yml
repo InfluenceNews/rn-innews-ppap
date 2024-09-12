@@ -18,8 +18,8 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.value }}
       env: ${{ steps.set-env.outputs.value }}
       message-information: ${{ steps.get-message-information.outputs.value }}
-      app-version: ${{ steps.get-app-infomation.outputs.versionValue }}
-      app-build-number: ${{ steps.get-app-infomation.outputs.buildNumberValue }}
+      app-version: ${{ steps.get-app-infomation.outputs.version-value }}
+      app-build-number: ${{ steps.get-app-infomation.outputs.build-number-value }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -62,8 +62,8 @@ jobs:
         id: get-app-infomation
         run: |
           source .github/scripts/utils.sh
-          echo "versionValue=$(get_version)" >> "$GITHUB_OUTPUT"
-          echo "buildNumberValue=$(get_build_number)" >> "$GITHUB_OUTPUT"
+          echo "version-value=$(get_version)" >> "$GITHUB_OUTPUT"
+          echo "build-number-value=$(get_build_number)" >> "$GITHUB_OUTPUT"
         timeout-minutes: 1
 
       - name: Log value
@@ -71,8 +71,8 @@ jobs:
           echo "tag-source: $REF_NAME"
           echo "matrix: ${{ steps.set-matrix.outputs.value }}"
           echo "message-information: ${{ steps.get-message-information.outputs.value }}"
-          echo "version: ${{ steps.get-app-infomation.outputs.versionValue }}"
-          echo "build number: ${{ steps.get-app-infomation.outputs.buildNumberValue }}"
+          echo "version: ${{ steps.get-app-infomation.outputs.version-value }}"
+          echo "build number: ${{ steps.get-app-infomation.outputs.build-number-value }}"
           echo "env: ${{ steps.set-env.outputs.value }}"
 
   deploy:
