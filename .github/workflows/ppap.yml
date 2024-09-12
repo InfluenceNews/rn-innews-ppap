@@ -186,11 +186,11 @@ jobs:
         if: matrix.format == 'aab'
         run: bundle exec fastlane android build_aab
 
-      # - name: Deploy ipa
-      #   if: matrix.format == 'ipa'
-      #   uses: maierj/fastlane-action@v3.1.0
-      #   with:
-      #     lane: ios deploy_ipa
+      - name: Deploy ipa
+        if: matrix.format == 'ipa'
+        uses: maierj/fastlane-action@v3.1.0
+        with:
+          lane: ios deploy_ipa
 
       - name: Deploy APK to firebase
         if: matrix.platform == 'android'
