@@ -206,7 +206,7 @@ jobs:
           lane: ios deploy_ipa
 
       - name: Deploy APK to firebase
-        if: matrix.platform == 'android'
+        if: matrix.format == 'apk'
         uses: maierj/fastlane-action@v3.1.0
         with:
           lane: android deploy_apk
