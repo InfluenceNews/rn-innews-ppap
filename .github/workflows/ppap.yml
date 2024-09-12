@@ -84,6 +84,11 @@ jobs:
       matrix:
         include: ${{ fromJson(needs.init.outputs.matrix) }}
     runs-on: ${{ matrix.name }}
+    env:
+      APP_VARIANT: ${{ needs.init.outputs.env }}
+      APP_VERSION: ${{ needs.init.outputs.app-version }}
+      APP_BUILD_NUMBER: ${{ needs.init.outputs.app-build-number }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -165,14 +170,9 @@ jobs:
       - name: Fastlane match
         if: matrix.platform == 'ios'
         run: bundle exec fastlane ios certificates && bundle exec fastlane ios update_settings
-        env:
-          APP_VARIANT: ${{ needs.init.outputs.env }}
 
       - name: Update version and build number
         run: bundle exec fastlane ${{ matrix.platform }} update_version_and_build_number
-        env:
-          APP_VERSION: ${{ needs.init.outputs.app-version }}
-          APP_BUILD_NUMBER: ${{ needs.init.outputs.app-build-number }}
 
       - name: Build ios
         if: matrix.format == 'ipa'
