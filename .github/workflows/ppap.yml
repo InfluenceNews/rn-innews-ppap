@@ -145,13 +145,13 @@ jobs:
         if: ${{ (matrix.platform == 'ios') && (steps.cache-prebuild.outputs.cache-hit != 'true') }}
         uses: borales/actions-yarn@v5
         with:
-          cmd: prebuild:dev --platform ios
+          cmd: prebuild:${{ needs.init.outputs.env }} --platform ios
 
       - name: Run expo prebuild android
         if: matrix.platform == 'android'
         uses: borales/actions-yarn@v5
         with:
-          cmd: prebuild:dev --platform android
+          cmd: prebuild:${{ needs.init.outputs.env }} --platform android
 
       - name: Cache ios deriveddata
         uses: irgaly/xcode-cache@v1
