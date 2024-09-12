@@ -9,6 +9,8 @@ on:
 env:
   GH_PAT: ${{ secrets.GH_PAT_INFLUENCE_NEWS }}
   GIT_SSH_COMMAND: ssh -i $(pwd)/.github/data/key/id_rsa
+  REF_NAME: ${{ github.event.client_payload.ref_name }}
+  TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor }}
 
 jobs:
   init:
