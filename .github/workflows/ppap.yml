@@ -192,11 +192,11 @@ jobs:
       #   with:
       #     lane: ios deploy_ipa
 
-      # - name: Deploy APK to firebase
-      #   if: matrix.format == 'apk'
-      #   uses: maierj/fastlane-action@v3.1.0
-      #   with:
-      #     lane: android deploy_apk
+      - name: Deploy APK to firebase
+        if: matrix.platform == 'android'
+        uses: maierj/fastlane-action@v3.1.0
+        with:
+          lane: android deploy_apk
 
       # - name: Deploy AAB to playstore
       #   if: matrix.format == 'aab'
