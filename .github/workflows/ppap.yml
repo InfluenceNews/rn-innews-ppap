@@ -147,7 +147,7 @@ jobs:
         with:
           java-version: 21
           distribution: "temurin"
-          cache: "gradle"
+          # cache: "gradle"
 
       - name: Setup Android SDK
         if: matrix.platform == 'android'
@@ -198,8 +198,8 @@ jobs:
         with:
           lane: android deploy_apk
 
-      # - name: Deploy AAB to playstore
-      #   if: matrix.format == 'aab'
-      #   uses: maierj/fastlane-action@v3.1.0
-      #   with:
-      #     lane: android deploy_aab
+      - name: Deploy AAB to playstore
+        if: matrix.format == 'aab'
+        uses: maierj/fastlane-action@v3.1.0
+        with:
+          lane: android deploy_aab
