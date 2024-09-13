@@ -107,6 +107,23 @@ jobs:
         with:
           node-version-file: ".nvmrc"
 
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        if: matrix.platform == 'android'
+        with:
+          java-version: 21
+          distribution: "temurin"
+
+      - name: Setup Android SDK
+        if: matrix.platform == 'android'
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        if: matrix.platform == 'android'
+        with:
+          ndk-version: r26c
+
       - name: Setup cocoapods
         if: matrix.platform == 'ios'
         uses: maxim-lobanov/setup-cocoapods@v1
@@ -118,6 +135,9 @@ jobs:
         with:
           ruby-version: 3.3
           bundler-cache: true
+
+      - name: Install fastlane plugins
+        run: bundle exec fastlane install_plugins
 
       - name: Cache node_module
         id: cache-node-module
@@ -142,16 +162,10 @@ jobs:
           key: ${{ matrix.platform }}-${{ needs.init.outputs.env }}-cache-prebuild-${{ hashFiles('app.config.js') }}-${{ hashFiles('yarn.lock') }}
 
       - name: Run expo prebuild ios
-        if: ${{ (matrix.platform == 'ios') && (steps.cache-prebuild.outputs.cache-hit != 'true') }}
+        if: ${{ (matrix.platform == 'android') || (steps.cache-prebuild.outputs.cache-hit != 'true') }}
         uses: borales/actions-yarn@v5
         with:
-          cmd: prebuild:${{ needs.init.outputs.env }} --platform ios
-
-      - name: Run expo prebuild android
-        if: matrix.platform == 'android'
-        uses: borales/actions-yarn@v5
-        with:
-          cmd: prebuild:${{ needs.init.outputs.env }} --platform android
+          cmd: prebuild:${{ needs.init.outputs.env }} --platform ${{ matrix.platform }}
 
       - name: Cache ios deriveddata
         uses: irgaly/xcode-cache@v1
@@ -160,26 +174,6 @@ jobs:
           key: xcode-cache-deriveddata-${{ needs.init.outputs.env }}-${{ hashFiles('app.config.js') }}}-${{ hashFiles('yarn.lock') }}
           restore-keys: xcode-cache-deriveddata-${{ needs.init.outputs.env }}-
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        if: matrix.platform == 'android'
-        with:
-          java-version: 21
-          distribution: "temurin"
-
-      - name: Setup Android SDK
-        if: matrix.platform == 'android'
-        uses: android-actions/setup-android@v3
-
-      - name: Setup Android NDK
-        uses: nttld/setup-ndk@v1
-        if: matrix.platform == 'android'
-        with:
-          ndk-version: r26c
-
-      - name: Install fastlane plugins
-        run: bundle exec fastlane install_plugins
-
       - name: Fastlane match
         if: matrix.platform == 'ios'
         run: bundle exec fastlane ios certificates && bundle exec fastlane ios update_settings
@@ -187,32 +181,8 @@ jobs:
       - name: Update version and build number
         run: bundle exec fastlane ${{ matrix.platform }} update_version_and_build_number
 
-      - name: Build ios
-        if: matrix.format == 'ipa'
-        run: bundle exec fastlane ios build_ipa
+      - name: Build ${{ matrix.format }}
+        run: bundle exec fastlane ${{ matrix.platform }} build_${{ matrix.format }}
 
-      - name: Build apk
-        if: matrix.format == 'apk'
-        run: bundle exec fastlane android build_apk
-
-      - name: Build aab
-        if: matrix.format == 'aab'
-        run: bundle exec fastlane android build_aab
-
-      - name: Deploy ipa
-        if: matrix.format == 'ipa'
-        uses: maierj/fastlane-action@v3.1.0
-        with:
-          lane: ios deploy_ipa
-
-      - name: Deploy APK to firebase
-        if: matrix.format == 'apk'
-        uses: maierj/fastlane-action@v3.1.0
-        with:
-          lane: android deploy_apk
-
-      - name: Deploy AAB to playstore
-        if: matrix.format == 'aab'
-        uses: maierj/fastlane-action@v3.1.0
-        with:
-          lane: android deploy_aab
+      - name: Deploy ${{ matrix.format }}
+        run: bundle exec fastlane ${{ matrix.platform }} deploy_${{ matrix.format }}
