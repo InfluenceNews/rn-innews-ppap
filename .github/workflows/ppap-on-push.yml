@@ -154,7 +154,7 @@ jobs:
         id: cache-prebuild
         uses: actions/cache@v4
         with:
-          path: ios
+          path: ${{ matrix.platform }}
           key: ${{ matrix.platform }}-${{ needs.init.outputs.env }}-cache-prebuild-${{ hashFiles('app.config.js') }}-${{ hashFiles('yarn.lock') }}
 
       - name: Run prebuild
