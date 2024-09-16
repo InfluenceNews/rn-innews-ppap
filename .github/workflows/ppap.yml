@@ -155,7 +155,7 @@ jobs:
           path: ios
           key: ${{ matrix.platform }}-${{ needs.init.outputs.env }}-cache-prebuild-${{ hashFiles('app.config.js') }}-${{ hashFiles('yarn.lock') }}
 
-      - name: Run expo prebuild ios
+      - name: Run expo prebuild ${{ matrix.platform }}
         if: ${{ (matrix.platform == 'android') || (steps.cache-prebuild.outputs.cache-hit != 'true') }}
         uses: borales/actions-yarn@v5
         with:
