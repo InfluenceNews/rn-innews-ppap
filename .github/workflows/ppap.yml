@@ -7,8 +7,8 @@ on:
       - v*
 
 env:
+  GIT_SSH_COMMAND: chmod 400 $(pwd)/.github/data/key/id_rsa && ssh -i $(pwd)/.github/data/key/id_rsa
   GH_PAT: ${{ secrets.GH_PAT_INFLUENCE_NEWS }}
-  GIT_SSH_COMMAND: ssh -i $(pwd)/.github/data/key/id_rsa
   REF_NAME: ${{ github.event.client_payload.ref_name }}
   TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor }}
 
@@ -29,9 +29,6 @@ jobs:
           repository: InfluenceNews/rn-innews
           token: ${{ env.GH_PAT }}
           ref: ${{ github.event.client_payload.ref_name}}
-
-      - name: Allow key permissions
-        run: chmod 400 .github/data/key/id_rsa
 
       - name: Set matrix
         id: set-matrix
@@ -60,7 +57,7 @@ jobs:
           echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
         timeout-minutes: 1
 
-      - name: Generate message
+      - name: Generate app information
         id: get-app-infomation
         run: |
           source .github/scripts/utils.sh
@@ -98,9 +95,6 @@ jobs:
           repository: InfluenceNews/rn-innews
           token: ${{ env.GH_PAT }}
           ref: ${{ github.event.client_payload.ref_name}}
-
-      - name: Allow key permissions
-        run: chmod 400 .github/data/key/id_rsa
 
       - name: Setup Node
         uses: actions/setup-node@v4
