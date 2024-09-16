@@ -1,0 +1,186 @@
+name: PPAP
+
+on:
+  repository_dispatch:
+    types:
+      - ppap
+      # - v*
+  push:
+    branches:
+      - main
+
+
+env:
+  GIT_SSH_COMMAND: chmod 400 $(pwd)/.github/data/key/id_rsa && ssh -i $(pwd)/.github/data/key/id_rsa
+  GH_PAT: ${{ secrets.GH_PAT_INFLUENCE_NEWS }}
+  REF_NAME: ${{ github.event.client_payload.ref_name }}
+  TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor }}
+
+jobs:
+  init:
+    name: Init
+    runs-on: macos-14
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.value }}
+      env: ${{ steps.set-env.outputs.value }}
+      message-information: ${{ steps.get-message-information.outputs.value }}
+      app-version: ${{ steps.get-app-infomation.outputs.version-value }}
+      app-build-number: ${{ steps.get-app-infomation.outputs.build-number-value }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: InfluenceNews/rn-innews
+          token: ${{ env.GH_PAT }}
+          # ref: ${{ github.event.client_payload.ref_name}}
+
+      - name: Set matrix
+        id: set-matrix
+        run: |
+          MATRIX="[{\"format\":\"ipa\",\"name\":\"macos-14\",\"platform\":\"ios\"},{\"format\":\"apk\",\"name\":\"ubuntu-22.04\",\"platform\":\"android\"}]"
+          if [[ "$REF_NAME" =~ "prd" ]]; then
+            MATRIX="[{\"format\":\"ipa\",\"name\":\"macos-14\",\"platform\":\"ios\"},{\"format\":\"apk\",\"name\":\"ubuntu-22.04\",\"platform\":\"android\"},{\"format\":\"aab\",\"name\":\"ubuntu-22.04\",\"platform\":\"android\"}]"
+          fi
+          echo "value=$MATRIX" >> $GITHUB_OUTPUT
+
+      - name: Set env
+        id: set-env
+        run: |
+          ENV='dev'
+          if [[ "$REF_NAME" =~ "prd" ]]; then
+            ENV='prd'
+          elif [[ "$REF_NAME" =~ "stg" ]]; then
+            ENV='stg'
+          fi
+          echo "value=$ENV" >> $GITHUB_OUTPUT
+
+      - name: Generate message
+        id: get-message-information
+        run: |
+          source .github/scripts/utils.sh
+          echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
+        timeout-minutes: 1
+
+      - name: Generate app information
+        id: get-app-infomation
+        run: |
+          source .github/scripts/utils.sh
+          echo "version-value=$(get_version)" >> "$GITHUB_OUTPUT"
+          echo "build-number-value=$(get_build_number)" >> "$GITHUB_OUTPUT"
+        timeout-minutes: 1
+
+      - name: Log value
+        run: |
+          echo "tag-source: $REF_NAME"
+          echo "matrix: ${{ steps.set-matrix.outputs.value }}"
+          echo "message-information: ${{ steps.get-message-information.outputs.value }}"
+          echo "version: ${{ steps.get-app-infomation.outputs.version-value }}"
+          echo "build number: ${{ steps.get-app-infomation.outputs.build-number-value }}"
+          echo "env: ${{ steps.set-env.outputs.value }}"
+
+  deploy:
+    name: Deployment ${{ matrix.format }}
+    needs: [init]
+    continue-on-error: true
+    strategy:
+      fail-fast: true
+      matrix:
+        include: ${{ fromJson(needs.init.outputs.matrix) }}
+    runs-on: ${{ matrix.name }}
+    env:
+      APP_VARIANT: ${{ needs.init.outputs.env }}
+      APP_VERSION: ${{ needs.init.outputs.app-version }}
+      APP_BUILD_NUMBER: ${{ needs.init.outputs.app-build-number }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: InfluenceNews/rn-innews
+          token: ${{ env.GH_PAT }}
+          # ref: ${{ github.event.client_payload.ref_name}}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        if: matrix.platform == 'android'
+        with:
+          java-version: 21
+          distribution: "temurin"
+
+      - name: Setup Android SDK
+        if: matrix.platform == 'android'
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        if: matrix.platform == 'android'
+        with:
+          ndk-version: r26c
+
+      - name: Setup cocoapods
+        if: matrix.platform == 'ios'
+        uses: maxim-lobanov/setup-cocoapods@v1
+        with:
+          version: 1.15.2
+
+      - name: Setup ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3
+          bundler-cache: true
+
+      - name: Install fastlane plugins
+        run: bundle exec fastlane install_plugins
+
+      - name: Cache node_module
+        id: cache-node-module
+        if: matrix.platform == 'ios'
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ matrix.platform }}-cache-node-module-${{ hashFiles('app.config.js') }}-${{ hashFiles('yarn.lock') }}
+
+      - name: Run yarn install
+        if:  ${{ (matrix.platform == 'android') || (steps.cache-node-module.outputs.cache-hit != 'true') }}
+        uses: borales/actions-yarn@v5
+        with:
+          cmd: install --network-concurrency 1
+
+      - name: Cache ios folder
+        if: matrix.platform == 'ios'
+        id: cache-prebuild
+        uses: actions/cache@v4
+        with:
+          path: ios
+          key: ${{ matrix.platform }}-${{ needs.init.outputs.env }}-cache-prebuild-${{ hashFiles('app.config.js') }}-${{ hashFiles('yarn.lock') }}
+
+      - name: Run expo prebuild ios
+        if: ${{ (matrix.platform == 'android') || (steps.cache-prebuild.outputs.cache-hit != 'true') }}
+        uses: borales/actions-yarn@v5
+        with:
+          cmd: prebuild:${{ needs.init.outputs.env }} --platform ${{ matrix.platform }}
+
+      - name: Cache ios deriveddata
+        uses: irgaly/xcode-cache@v1
+        if: matrix.platform == 'ios'
+        with:
+          key: xcode-cache-deriveddata-${{ needs.init.outputs.env }}-${{ hashFiles('app.config.js') }}}-${{ hashFiles('yarn.lock') }}
+          restore-keys: xcode-cache-deriveddata-${{ needs.init.outputs.env }}-
+
+      - name: Fastlane match
+        if: matrix.platform == 'ios'
+        run: bundle exec fastlane ios certificates && bundle exec fastlane ios update_settings
+
+      - name: Update version and build number
+        run: bundle exec fastlane ${{ matrix.platform }} update_version_and_build_number
+
+      - name: Build ${{ matrix.format }}
+        run: bundle exec fastlane ${{ matrix.platform }} build_${{ matrix.format }}
+
+      - name: Deploy ${{ matrix.format }}
+        run: bundle exec fastlane ${{ matrix.platform }} deploy_${{ matrix.format }}
