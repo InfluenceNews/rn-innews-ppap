@@ -182,5 +182,5 @@ jobs:
       - name: Build ${{ matrix.format }}
         run: bundle exec fastlane ${{ matrix.platform }} build_${{ matrix.format }}
 
-      - name: Deploy ${{ matrix.format }}
-        run: bundle exec fastlane ${{ matrix.platform }} deploy_${{ matrix.format }}
+      # - name: Deploy ${{ matrix.format }}
+      #   run: bundle exec fastlane ${{ matrix.platform }} deploy_${{ matrix.format }}
