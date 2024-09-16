@@ -9,7 +9,6 @@ on:
     branches:
       - main
 
-
 env:
   GIT_SSH_COMMAND: chmod 400 $(pwd)/.github/data/key/id_rsa && ssh -i $(pwd)/.github/data/key/id_rsa
   GH_PAT: ${{ secrets.GH_PAT_INFLUENCE_NEWS }}
@@ -52,6 +51,7 @@ jobs:
           elif [[ "$REF_NAME" =~ "stg" ]]; then
             ENV='stg'
           fi
+          ENV='dev'
           echo "value=$ENV" >> $GITHUB_OUTPUT
 
       - name: Generate message
@@ -65,8 +65,8 @@ jobs:
         id: get-app-infomation
         run: |
           source .github/scripts/utils.sh
-          echo "version-value=$(get_version)" >> "$GITHUB_OUTPUT"
-          echo "build-number-value=$(get_build_number)" >> "$GITHUB_OUTPUT"
+          echo "version-value=1.0.0" >> "$GITHUB_OUTPUT"
+          echo "build-number-value=10" >> "$GITHUB_OUTPUT"
         timeout-minutes: 1
 
       - name: Log value
@@ -139,28 +139,26 @@ jobs:
 
       - name: Cache node_module
         id: cache-node-module
-        if: matrix.platform == 'ios'
         uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ matrix.platform }}-cache-node-module-${{ hashFiles('app.config.js') }}-${{ hashFiles('yarn.lock') }}
 
       - name: Run yarn install
-        if:  ${{ (matrix.platform == 'android') || (steps.cache-node-module.outputs.cache-hit != 'true') }}
+        if: steps.cache-node-module.outputs.cache-hit != 'true'
         uses: borales/actions-yarn@v5
         with:
           cmd: install --network-concurrency 1
 
-      - name: Cache ios folder
-        if: matrix.platform == 'ios'
+      - name: Cache prebuild
         id: cache-prebuild
         uses: actions/cache@v4
         with:
           path: ios
           key: ${{ matrix.platform }}-${{ needs.init.outputs.env }}-cache-prebuild-${{ hashFiles('app.config.js') }}-${{ hashFiles('yarn.lock') }}
 
-      - name: Run expo prebuild ios
-        if: ${{ (matrix.platform == 'android') || (steps.cache-prebuild.outputs.cache-hit != 'true') }}
+      - name: Run prebuild
+        if: steps.cache-prebuild.outputs.cache-hit != 'true'
         uses: borales/actions-yarn@v5
         with:
           cmd: prebuild:${{ needs.init.outputs.env }} --platform ${{ matrix.platform }}
