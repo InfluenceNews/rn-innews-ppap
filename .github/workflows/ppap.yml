@@ -108,6 +108,7 @@ jobs:
         with:
           java-version: 21
           distribution: "temurin"
+          cache: "gradle"
 
       - name: Setup Android SDK
         if: matrix.platform == 'android'
@@ -130,14 +131,13 @@ jobs:
 
       - name: Cache node_module
         id: cache-node-module
-        if: matrix.platform == 'ios'
         uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ matrix.platform }}-cache-node-module-${{ hashFiles('app.config.js') }}-${{ hashFiles('yarn.lock') }}
 
       - name: Run yarn install
-        if:  ${{ (matrix.platform == 'android') || (steps.cache-node-module.outputs.cache-hit != 'true') }}
+        if: steps.cache-node-module.outputs.cache-hit != 'true'
         uses: borales/actions-yarn@v5
         with:
           cmd: install --network-concurrency 1
