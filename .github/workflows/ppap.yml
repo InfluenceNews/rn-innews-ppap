@@ -114,11 +114,11 @@ jobs:
         if: matrix.platform == 'android'
         uses: android-actions/setup-android@v3
 
-      - name: Setup Android NDK
-        uses: nttld/setup-ndk@v1
-        if: matrix.platform == 'android'
-        with:
-          ndk-version: r26c
+      # - name: Setup Android NDK
+      #   uses: nttld/setup-ndk@v1
+      #   if: matrix.platform == 'android'
+      #   with:
+      #     ndk-version: r26c
 
       - name: Setup cocoapods
         if: matrix.platform == 'ios'
