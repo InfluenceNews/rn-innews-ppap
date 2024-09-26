@@ -37,7 +37,6 @@ jobs:
           if [[ "$REF_NAME" =~ "prd" ]]; then
             MATRIX="[{\"format\":\"ipa\",\"name\":\"macos-14\",\"platform\":\"ios\"},{\"format\":\"apk\",\"name\":\"ubuntu-22.04\",\"platform\":\"android\"},{\"format\":\"aab\",\"name\":\"ubuntu-22.04\",\"platform\":\"android\"}]"
           fi
-          MATRIX="[{\"format\":\"apk\",\"name\":\"ubuntu-22.04\",\"platform\":\"android\"}]"
           echo "value=$MATRIX" >> $GITHUB_OUTPUT
 
       - name: Set env
@@ -113,12 +112,6 @@ jobs:
       - name: Setup Android SDK
         if: matrix.platform == 'android'
         uses: android-actions/setup-android@v3
-
-      # - name: Setup Android NDK
-      #   uses: nttld/setup-ndk@v1
-      #   if: matrix.platform == 'android'
-      #   with:
-      #     ndk-version: r26c
 
       - name: Setup cocoapods
         if: matrix.platform == 'ios'
