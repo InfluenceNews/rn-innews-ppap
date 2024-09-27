@@ -54,12 +54,17 @@ jobs:
       - name: Generate message
         id: get-message-information
         timeout-minutes: 1
-        run: source /dev/stdin <<<"$(curl -s ${{ env.UTILS_SH }})" && echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
+        run: |
+          source /dev/stdin <<<"$(curl -s ${{ env.UTILS_SH }})" 
+          echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
 
       - name: Generate app information
         id: get-app-infomation
         timeout-minutes: 1
-        run: source /dev/stdin <<<"$(curl -s ${{ env.UTILS_SH }})" && echo "version-value=$(get_version)" >> "$GITHUB_OUTPUT" && echo "build-number-value=$(get_build_number)" >> "$GITHUB_OUTPUT"
+        run: |
+          source /dev/stdin <<<"$(curl -s ${{ env.UTILS_SH }})" 
+          echo "version-value=$(get_version)" >> "$GITHUB_OUTPUT" 
+          echo "build-number-value=$(get_build_number)" >> "$GITHUB_OUTPUT"
 
       - name: Log value
         run: |
