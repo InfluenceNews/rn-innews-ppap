@@ -169,7 +169,7 @@ jobs:
         if: matrix.platform == 'ios'
         run: bundle exec fastlane ios certificates && bundle exec fastlane ios update_settings
 
-      - name: Update JVM
+      - name: Update JVM args
         if: matrix.platform == 'android'
         run: sed -i.bak "s/^org.gradle.jvmargs=.*/$NEW_JVM_ARGS/" android/gradle.properties
 
