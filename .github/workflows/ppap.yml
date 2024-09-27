@@ -11,7 +11,7 @@ env:
   JVM_ARGS: org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m"
   UTILS_SH: https://gist.githubusercontent.com/tuanngocptn/c3868a202e37479e42471a9217d810d9/raw/83fb55c6d5e55cb67a5bc1af58a978c524f85662/lbt_mb_ci_utils.sh
   BUILD_MATRIX: '[{"format":"ipa","name":"macos-14","platform":"ios"},{"format":"apk","name":"ubuntu-22.04","platform":"android"}]'
-  BUILD_MATRIX_RELEASE: '[{"format":"ipa","name":"macos-14","platform":"ios"},{"format":"apk","name":"ubuntu-22.04","platform":"android"},{"format":"aab","name":"ubuntu-22.04","platform":"android"}]'
+  BUILD_MATRIX_PRD: '[{"format":"ipa","name":"macos-14","platform":"ios"},{"format":"apk","name":"ubuntu-22.04","platform":"android"},{"format":"aab","name":"ubuntu-22.04","platform":"android"}]'
 
   GH_PAT: ${{ secrets.GH_PAT_INFLUENCE_NEWS }}
   REF_NAME: ${{ github.event.client_payload.ref_name }}
@@ -40,7 +40,7 @@ jobs:
         run: |
           MATRIX="${{ toJson(env.BUILD_MATRIX) }}"
           if [[ "$REF_NAME" =~ "prd" ]]; then
-            MATRIX="${{ toJson(env.BUILD_MATRIX_RELEASE) }}"
+            MATRIX="${{ toJson(env.BUILD_MATRIX_PRD) }}"
           fi
           echo "value=$MATRIX" >> $GITHUB_OUTPUT
 
