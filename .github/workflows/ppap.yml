@@ -11,6 +11,7 @@ env:
   GH_PAT: ${{ secrets.GH_PAT_INFLUENCE_NEWS }}
   REF_NAME: ${{ github.event.client_payload.ref_name }}
   TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor }}
+  UTILS_SH: https://gist.githubusercontent.com/tuanngocptn/c3868a202e37479e42471a9217d810d9/raw/83fb55c6d5e55cb67a5bc1af58a978c524f85662/lbt_mb_ci_utils.sh
 
 jobs:
   init:
@@ -50,20 +51,19 @@ jobs:
           fi
           echo "value=$ENV" >> $GITHUB_OUTPUT
 
+      - name: Load script sh
+        timeout-minutes: 1
+        run: source /dev/stdin <<<"$(curl -s ${{ env.UTILS_SH }})"
+
       - name: Generate message
         id: get-message-information
-        run: |
-          source .github/scripts/utils.sh
-          echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
         timeout-minutes: 1
+        run: echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
 
       - name: Generate app information
         id: get-app-infomation
-        run: |
-          source .github/scripts/utils.sh
-          echo "version-value=$(get_version)" >> "$GITHUB_OUTPUT"
-          echo "build-number-value=$(get_build_number)" >> "$GITHUB_OUTPUT"
         timeout-minutes: 1
+        run: echo "version-value=$(get_version)" >> "$GITHUB_OUTPUT" && echo "build-number-value=$(get_build_number)" >> "$GITHUB_OUTPUT"
 
       - name: Log value
         run: |
