@@ -8,7 +8,6 @@ on:
 
 env:
   GIT_SSH_COMMAND: chmod 400 $(pwd)/.github/data/key/id_rsa && ssh -i $(pwd)/.github/data/key/id_rsa
-  JVM_ARGS: org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m"
   UTILS_SH: https://gist.githubusercontent.com/tuanngocptn/c3868a202e37479e42471a9217d810d9/raw/83fb55c6d5e55cb67a5bc1af58a978c524f85662/lbt_mb_ci_utils.sh
   BUILD_MATRIX: '[{"format":"ipa","name":"macos-14","platform":"ios"},{"format":"apk","name":"ubuntu-22.04","platform":"android"}]'
   BUILD_MATRIX_PRD: '[{"format":"ipa","name":"macos-14","platform":"ios"},{"format":"apk","name":"ubuntu-22.04","platform":"android"},{"format":"aab","name":"ubuntu-22.04","platform":"android"}]'
@@ -168,10 +167,6 @@ jobs:
       - name: Fastlane match
         if: matrix.platform == 'ios'
         run: bundle exec fastlane ios certificates && bundle exec fastlane ios update_settings
-
-      - name: Update JVM args
-        if: matrix.platform == 'android'
-        run: sed -i.bak "s/^org.gradle.jvmargs=.*/$NEW_JVM_ARGS/" android/gradle.properties
 
       - name: Update version and build number
         run: bundle exec fastlane ${{ matrix.platform }} update_version_and_build_number
