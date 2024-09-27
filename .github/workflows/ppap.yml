@@ -8,8 +8,8 @@ on:
 
 env:
   GIT_SSH_COMMAND: chmod 400 $(pwd)/.github/data/key/id_rsa && ssh -i $(pwd)/.github/data/key/id_rsa
+  JVM_ARGS: org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m"
   UTILS_SH: https://gist.githubusercontent.com/tuanngocptn/c3868a202e37479e42471a9217d810d9/raw/83fb55c6d5e55cb67a5bc1af58a978c524f85662/lbt_mb_ci_utils.sh
-  JVM_ARGS: org.gradle.jvmargs=-Xms512M -Xmx4g -XX:MaxPermSize=1024m -XX:MaxMetaspaceSize=1g -Dkotlin.daemon.jvm.options="-Xmx1g"
   BUILD_MATRIX: '[{"format":"ipa","name":"macos-14","platform":"ios"},{"format":"apk","name":"ubuntu-22.04","platform":"android"}]'
   BUILD_MATRIX_RELEASE: '[{"format":"ipa","name":"macos-14","platform":"ios"},{"format":"apk","name":"ubuntu-22.04","platform":"android"},{"format":"aab","name":"ubuntu-22.04","platform":"android"}]'
 
