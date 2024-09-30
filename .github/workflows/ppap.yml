@@ -177,5 +177,6 @@ jobs:
         #   _JAVA_OPTIONS: "-Xmx4g -XX:MaxPermSize=1024m"
         #   GRADLE_OPTS: "-Xms512M -Xmx4g -XX:MaxPermSize=1024m -XX:MaxMetaspaceSize=1g -Dkotlin.daemon.jvm.options=-Xmx1g"
 
-      # - name: Deploy ${{ matrix.format }}
-      #   run: bundle exec fastlane ${{ matrix.platform }} deploy_${{ matrix.format }}
+      - name: Deploy ${{ matrix.format }}
+        if: matrix.platform == 'apk'
+        run: bundle exec fastlane ${{ matrix.platform }} deploy_${{ matrix.format }}
