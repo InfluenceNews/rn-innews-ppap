@@ -168,12 +168,12 @@ jobs:
         if: matrix.platform == 'android'
         uses: android-actions/setup-android@v3
 
-      - name: Cache ios deriveddata
-        uses: irgaly/xcode-cache@v1
-        if: matrix.platform == 'ios'
-        with:
-          key: xcode-cache-deriveddata-${{ env.APP_VARIANT }}-${{ hashFiles('app.config.js') }}}-${{ hashFiles('yarn.lock') }}
-          restore-keys: xcode-cache-deriveddata-${{ env.APP_VARIANT }}-
+      # - name: Cache ios deriveddata
+      #   uses: irgaly/xcode-cache@v1
+      #   if: matrix.platform == 'ios'
+      #   with:
+      #     key: xcode-cache-deriveddata-${{ env.APP_VARIANT }}-${{ hashFiles('app.config.js') }}}-${{ hashFiles('yarn.lock') }}
+      #     restore-keys: xcode-cache-deriveddata-${{ env.APP_VARIANT }}-
 
       - name: Fastlane match
         if: matrix.platform == 'ios'
