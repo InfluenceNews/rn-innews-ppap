@@ -11,6 +11,7 @@ env:
   UTILS_SH: https://gist.githubusercontent.com/tuanngocptn/c3868a202e37479e42471a9217d810d9/raw/lbt_mb_ci_utils.sh
   BUILD_MATRIX: '[{"format":"ipa","name":"macos-14","platform":"ios"},{"format":"apk","name":"ubuntu-22.04","platform":"android"}]'
   BUILD_MATRIX_PRD: '[{"format":"ipa","name":"macos-14","platform":"ios"},{"format":"apk","name":"ubuntu-22.04","platform":"android"},{"format":"aab","name":"ubuntu-22.04","platform":"android"}]'
+  NODE_ENV: production
 
   GH_PAT: ${{ secrets.GH_PAT_INFLUENCE_NEWS }}
   REF_NAME: ${{ github.event.client_payload.ref_name }}
