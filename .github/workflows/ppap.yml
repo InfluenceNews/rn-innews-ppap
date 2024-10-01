@@ -168,13 +168,6 @@ jobs:
         if: matrix.platform == 'android'
         uses: android-actions/setup-android@v3
 
-      # - name: Cache ios deriveddata
-      #   uses: irgaly/xcode-cache@v1
-      #   if: matrix.platform == 'ios'
-      #   with:
-      #     key: xcode-cache-deriveddata-${{ env.APP_VARIANT }}-${{ hashFiles('app.config.js') }}}-${{ hashFiles('yarn.lock') }}
-      #     restore-keys: xcode-cache-deriveddata-${{ env.APP_VARIANT }}-
-
       - name: Fastlane match
         if: matrix.platform == 'ios'
         run: bundle exec fastlane ios certificates && bundle exec fastlane ios update_settings
@@ -183,10 +176,10 @@ jobs:
         run: bundle exec fastlane ${{ matrix.platform }} update_version_and_build_number
 
       - name: Build ${{ matrix.format }}
-        run: bundle exec fastlane ${{ matrix.platform }} build_${{ matrix.format }}
-        # env:
-        #   _JAVA_OPTIONS: "-Xmx4g -XX:MaxPermSize=1024m"
-        #   GRADLE_OPTS: "-Xms512M -Xmx4g -XX:MaxPermSize=1024m -XX:MaxMetaspaceSize=1g -Dkotlin.daemon.jvm.options=-Xmx1g"
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 2
+          command: bundle exec fastlane ${{ matrix.platform }} build_${{ matrix.format }}
 
       - name: Deploy ${{ matrix.format }}
         run: bundle exec fastlane ${{ matrix.platform }} deploy_${{ matrix.format }}
